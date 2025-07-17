@@ -29,16 +29,33 @@ function Text() {
     setLoading(true);
     setError(null);
 
-    // Replace with your actual API endpoint
-    const apiUrl = `https://thegoodbroker.app.n8n.cloud/webhook-test/c69ce562-2f86-4f1b-a5ad-d33d473f9ce4?contactId=${encodeURIComponent(contactId)}&query=${encodeURIComponent(query)}`;
+    const apiUrl = `https://thegoodbroker.app.n8n.cloud/webhook-test/c69ce562-2f86-4f1b-a5ad-d33d473f9ce4`;
 
     try {
-      const response = await fetch(apiUrl);
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, contactId, query }),
+      });
+
+      const responseData = await response.json();
+      console.log('API Response:', responseData); // This is great for debugging!
+
       if (!response.ok) {
-        throw new Error('Failed to fetch results');
+        throw new Error(responseData.message || `Request failed with status ${response.status}`);
       }
-      const data = await response.json();
-      setResults(data);
+
+      // FIX #1: Handle the API response correctly.
+      // If the response is a single object, wrap it in an array so our .map() can work.
+      if (responseData && typeof responseData === 'object' && !Array.isArray(responseData)) {
+        setResults([responseData]);
+      } else {
+        // If it's already an array (or something else), use the old logic.
+        setResults(Array.isArray(responseData) ? responseData : []);
+      }
+
     } catch (error) {
       setError(error.message);
     } finally {
@@ -46,8 +63,6 @@ function Text() {
     }
   };
 
-  // A component to handle the "Search All Fields" functionality can be implemented here.
-  // For now, it's a placeholder.
   function All() {
     return <h2>Search All Fields Form</h2>;
   }
@@ -55,6 +70,8 @@ function Text() {
   return (
     <div className="app">
       <h1>Search Contact</h1>
+
+      {/* ... (The forms code is correct and unchanged) ... */}
 
       {!showForm && !showAllForm && (
         <>
@@ -68,7 +85,6 @@ function Text() {
             />
             <button type="submit">Continue</button>
           </form>
-
           <button onClick={() => setShowAllForm(true)} style={{ marginTop: '20px' }}>
             Search All Fields
           </button>
@@ -78,7 +94,7 @@ function Text() {
       {showForm && !showAllForm && (
         <>
           <form onSubmit={handleQuerySubmit}>
-            <h2>Search by Contact ID</h2>
+            <h2>Search by Contact ID & Query</h2>
             <p>Email: {email}</p>
             <input
               type="text"
@@ -102,14 +118,14 @@ function Text() {
           <div style={{ marginTop: '20px' }}>
             <h3>Results ({results.length})</h3>
             {loading && <p>Loading...</p>}
-            {error && <p>Error: {error}</p>}
+            {error && <p style={{ color: 'red' }}>Error: {error}</p>}
             {!loading && !error && results.length === 0 && <p>No results found.</p>}
             <ul>
+              {/* FIX #2: Render only the data that exists in the response. */}
               {results.map((item, index) => (
                 <li key={index} style={{ marginBottom: '10px' }}>
-                  <strong>Contact ID:</strong> {item.contactId} <br />
-                  <strong>Email:</strong> {item.email} <br />
-                  <em>{item.info}</em>
+                  {/* The API only provides 'output', so we only render that. */}
+                  <p>{item.output}</p>
                 </li>
               ))}
             </ul>
