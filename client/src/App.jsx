@@ -12,10 +12,10 @@ function App() {
 
       <div style={{ marginBottom: '20px' }}>
         <button onClick={() => setActiveComponent('show')} disabled={activeComponent === 'show'}>
-          Show By All Fields
+          Global Search
         </button>
         <button onClick={() => setActiveComponent('text')} disabled={activeComponent === 'text'} style={{ marginLeft: '10px' }}>
-          Text By Contact ID
+          Search By Email & Query
         </button>
       </div>
 
