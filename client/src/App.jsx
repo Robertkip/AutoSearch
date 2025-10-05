@@ -5,9 +5,17 @@ import { useState } from 'react';
 
 function App() {
   const [activeComponent, setActiveComponent] = useState('show'); // default to Show
+  const [theme, setTheme] = useState('light'); // default to light theme
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
 
   return (
-    <div className="app">
+    <div className={`app ${theme === 'dark' ? 'dark-theme' : ''}`}>
+      <button onClick={toggleTheme} className="theme-toggle-button">
+        {theme === 'light' ? '🌙' : '☀️'}
+      </button>
       <h1>Search Information</h1>
 
       <div style={{ marginBottom: '20px' }}>
